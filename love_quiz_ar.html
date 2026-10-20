@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>اختبار الحب 💕</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htm@3.1.1/dist/htm.umd.js"></script>
+<style>
+:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html,body{margin:0;overflow-x:hidden;font-family:'Cairo',system-ui,sans-serif}
+@keyframes floatUp{0%{transform:translateY(0) scale(.6);opacity:0}15%{opacity:.8}100%{transform:translateY(-115vh) scale(1.1) rotate(25deg);opacity:0}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-40px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes pulseBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes fall{0%{transform:translateY(-10vh) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
+@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {useState,useMemo,useRef}=React;
+const html=htm.bind(React.createElement);
+const Q=[
+["اسم حبيبك منو؟","text","🧸"],
+["طول {n} كم؟","text","📏"],
+["أكتر شي بكرهو {n} شنو؟","text","😤"],
+["أكتر شي بحبو {n} فيك شنو؟","text","🥰"],
+["{n} زول شيخ ولا قليل أدب؟","choice","🎩",["شيخ","قليل أدب","نص ونص"]],
+["بتحبي {n} أكتر ولا عندك شك؟","choice","💘",["بحبو أكتر","عندي شك","ما عارفة"]],
+["وين اتقابلتو أول مرة؟","text","📍"],
+["شنو أول شي لفت انتباهك في {n}؟","text","👀"],
+["شنو أحلى كلمة بيقولها ليك {n} وبتخليك تذوبي؟","text","🫠"],
+["أكل {n} المفضل شنو؟","text","🍕"],
+["لون {n} المفضل شنو؟","text","🎨"],
+["{n} بيغير عليك؟","choice","😏",["كتير","شوية","ولا شوية"]],
+["أحلى هدية {n} اداك ليها شنو؟","text","🎁"],
+["لو سافرتي مع {n} تختاري وين؟","text","✈️"],
+["{n} بيتصل بيك كم مرة في اليوم؟","choice","📞",["مرة","كم مرة","طول اليوم"]],
+["شنو أكتر شي بيضحكك في {n}؟","text","😂"],
+["لمن تزعلي من {n} بيعمل شنو عشان يصالحك؟","text","🌹"],
+["شنو أحلى ذكرى ليكم مع بعض؟","text","📸"],
+["بتشوفي نفسك و{n} وين بعد ٥ سنين؟","text","💍"],
+["من 1 لـ 10 بتحبي {n} كم؟","score","❤️‍🔥"]
+];
+function App(){
+ const [step,setStep]=useState(0);
+ const [ans,setAns]=useState(Array(20).fill(""));
+ const [err,setErr]=useState(false);
+ const [snd,setSnd]=useState(false);
+ const ac=useRef(null);
+ const hearts=useMemo(()=>Array.from({length:18},(_,i)=>({i,l:Math.random()*95,s:16+Math.random()*28,d:7+Math.random()*8,dl:Math.random()*10,e:["❤️","💗","💖","🩷","💕"][i%5]})),[]);
+ const confetti=useMemo(()=>Array.from({length:30},(_,i)=>({i,l:Math.random()*100,s:16+Math.random()*16,d:3+Math.random()*3,dl:Math.random()*2,e:["❤️","💗","💖","🌹"][i%4]})),[]);
+ const name=ans[0].trim();
+ const txt=(i)=>Q[i][0].replace(/\{n\}/g,name||"حبيبك");
+ const tap=()=>{if(!snd)return;try{navigator.vibrate&&navigator.vibrate(20);ac.current=ac.current||new (window.AudioContext||window.webkitAudioContext)();const o=ac.current.createOscillator(),g=ac.current.createGain();o.frequency.value=660;g.gain.value=.05;o.connect(g);g.connect(ac.current.destination);o.start();o.stop(ac.current.currentTime+.08)}catch(e){}};
+ const go=(n)=>{setErr(false);setStep(n)};
+ const set=(v)=>setAns(a=>a.map((x,k)=>k===step-1?v:x));
+ const next=()=>{tap();const k=step-1;if(Q[k][1]==="text"&&!ans[k].trim()){setErr(false);setTimeout(()=>setErr(true),10);return}if(Q[k][1]!=="text"&&!ans[k])return;go(step+1)};
+ const pick=(v)=>{tap();setAns(a=>a.map((x,k)=>k===step-1?v:x));setTimeout(()=>go(step+1),350)};
+ const reset=()=>{setAns(Array(20).fill(""));go(0)};
+ const score=parseInt(ans[19])||5;
+ const pct=Math.min(100,Math.max(40,50+score*4+(ans[5]==="بحبو أكتر"?10:ans[5]==="عندي شك"?-8:0)));
+ const msg=pct>=90?"روح واحدة في جسدين! حب مكتوب في النجوم ✨":pct>=75?"حب كبير وجميل، ربنا يديمو 💞":pct>=60?"حب حلو وبيكبر كل يوم 🌱":"الحب عايز وقت، كتروا من الكلام والضحك 💬";
+ const date=new Date().toLocaleDateString("ar",{year:"numeric",month:"long",day:"numeric"});
+ const btn="w-full min-h-14 rounded-3xl text-white font-bold text-lg bg-gradient-to-r from-pink-500 to-red-500 shadow-lg active:scale-95";
+ const i=step-1;
+ return html`
+ <div className="relative min-h-screen overflow-x-hidden bg-gradient-to-b from-pink-100 via-rose-100 to-pink-200 text-rose-900">
+  ${hearts.map(h=>html`<span key=${h.i} className="absolute bottom-0 pointer-events-none select-none" style=${{left:h.l+"%",fontSize:h.s,animation:`floatUp ${h.d}s linear ${h.dl}s infinite`}}>${h.e}</span>`)}
+  ${step===21&&confetti.map(h=>html`<span key=${"c"+h.i} className="fixed top-0 pointer-events-none z-20" style=${{left:h.l+"%",fontSize:h.s,animation:`fall ${h.d}s linear ${h.dl}s 2 both`}}>${h.e}</span>`)}
+  <div className="relative z-10 mx-auto w-full max-w-md px-4 py-5 flex flex-col min-h-screen">
+   <div className="flex justify-end"><button aria-label="الصوت" onClick=${()=>setSnd(!snd)} className="rounded-full bg-white/70 px-3 py-2 text-sm font-semibold text-rose-600">${snd?"🔊 شغال":"🔇 مقفول"}</button></div>
+
+   ${step===0&&html`<div key="w" className="flex-1 flex flex-col items-center justify-center text-center gap-5" style=${{animation:"slideIn .5s"}}>
+     <div className="text-7xl" style=${{animation:"bob 2.5s infinite"}}>🧸💍🌹</div>
+     <div className="text-6xl" style=${{animation:"beat 1.2s infinite"}}>💖</div>
+     <h1 className="text-4xl font-bold text-rose-600">اختبار الحب 💕</h1>
+     <p className="text-lg text-rose-700">20 سؤال حلو عن الزول البخلي قلبك يدق.</p>
+     <button onClick=${()=>{tap();go(1)}} className=${btn} style=${{animation:"pulseBtn 1.6s infinite"}}>ابدئي 💘</button></div>`}
+
+   ${step>=1&&step<=20&&html`<div className="flex-1 flex flex-col gap-4">
+     <div><div className="text-sm font-bold text-rose-600 mb-1">السؤال ${step} من 20</div>
+      <div className="h-3 rounded-full bg-white/70 overflow-hidden"><div className="h-full rounded-full bg-gradient-to-l from-pink-400 to-red-500" style=${{width:step/20*100+"%",transition:"width .5s"}}></div></div></div>
+     <div key=${step} className="rounded-3xl bg-white/80 backdrop-blur shadow-xl p-5 flex flex-col items-center gap-4 text-center" style=${{animation:"slideIn .4s"}}>
+      <div className="text-7xl" style=${{animation:"bob 2.5s infinite"}}>${Q[i][2]}</div>
+      <h2 className="text-xl font-bold leading-relaxed">${txt(i)}</h2>
+      ${Q[i][1]==="text"&&html`<div className="w-full" style=${err?{animation:"shake .4s"}:{}}>
+        <input autoFocus value=${ans[i]} onChange=${e=>{set(e.target.value);setErr(false)}} onKeyDown=${e=>e.key==="Enter"&&next()} placeholder="اكتبي هنا…" className="w-full min-h-14 rounded-3xl border-2 border-pink-300 bg-white px-4 text-lg text-center outline-none focus:border-rose-500"/>
+        ${err&&html`<p className="mt-2 text-sm font-semibold text-red-500">ما تتخطي السؤال دا 🥺💕</p>`}</div>`}
+      ${Q[i][1]==="choice"&&html`<div className="w-full flex flex-col gap-3">${Q[i][3].map(c=>html`<button key=${c} onClick=${()=>pick(c)} className=${"w-full min-h-14 rounded-3xl text-lg font-bold border-2 active:scale-95 "+(ans[i]===c?"bg-rose-500 text-white border-rose-500":"bg-white text-rose-700 border-pink-300")}>${c}</button>`)}</div>`}
+      ${Q[i][1]==="score"&&html`<div dir="ltr" className="w-full grid grid-cols-5 gap-2">${[1,2,3,4,5,6,7,8,9,10].map(n=>html`<button key=${n} onClick=${()=>pick(String(n))} className=${"min-h-14 rounded-2xl text-lg font-bold border-2 active:scale-95 "+(ans[i]==String(n)?"bg-rose-500 text-white border-rose-500":"bg-white text-rose-700 border-pink-300")}>${n}</button>`)}</div>`}
+     </div>
+     <div className="flex gap-3 mt-auto">
+      <button onClick=${()=>{tap();go(step-1)}} className="min-h-14 px-5 rounded-3xl bg-white/80 text-rose-600 font-bold text-lg shadow">→ رجوع</button>
+      ${Q[i][1]==="text"&&html`<button onClick=${next} className=${btn+" flex-1"} style=${{animation:"pulseBtn 1.6s infinite"}}>التالي ←</button>`}
+     </div></div>`}
+
+   ${step===21&&html`<div key="r" className="flex flex-col gap-4" style=${{animation:"slideIn .5s"}}>
+     <div className="rounded-3xl bg-gradient-to-b from-white to-pink-50 shadow-xl p-5 border-2 border-pink-200">
+      <div className="text-center text-3xl" style=${{animation:"bob 2.5s infinite"}}>🌹🧸💍</div>
+      <h1 className="text-center text-2xl font-bold text-rose-600 mt-1">قصة حبنا 💕</h1>
+      <p className="text-center text-sm text-rose-400 mb-3">${date}</p>
+      <div className="rounded-2xl bg-pink-100 p-3 text-center mb-3">
+       <div className="text-3xl" style=${{animation:"beat 1s infinite"}}>❤️</div>
+       <div className="text-3xl font-bold text-red-500">${pct}%</div>
+       <div className="h-3 rounded-full bg-white overflow-hidden my-2"><div className="h-full bg-gradient-to-l from-pink-400 to-red-500" style=${{width:pct+"%",transition:"width 1.5s"}}></div></div>
+       <p className="text-sm font-semibold text-rose-700">${msg}</p></div>
+      <div className="flex flex-col gap-2">${Q.map((q,k)=>html`<div key=${k} className="border-b border-pink-100 pb-2"><div className="text-xs font-semibold text-pink-500">${q[2]} ${k+1}. ${txt(k)}</div><div className="text-base font-bold text-rose-900 break-words">${ans[k]}</div></div>`)}</div>
+      <p className="text-center text-2xl mt-3">💖💗💞💗💖</p>
+     </div>
+     <p className="text-center font-semibold text-rose-700">اعملي سكرين 📸</p>
+     <button onClick=${reset} className=${btn}>↻ ابدئي من جديد</button></div>`}
+  </div>
+ </div>`;
+}
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
